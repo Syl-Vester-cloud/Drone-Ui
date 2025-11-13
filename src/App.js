@@ -6,14 +6,13 @@ const ControlDashboard = () => {
   const [isConnected, setIsConnected] = useState(false);
   const [isThrottled, setIsThrottled] = useState(false);  // New: Gate for directional controls
   const [status, setStatus] = useState('Disconnected');
-  const [espIP, setEspIP] = useState('192.168.0.103');
+  const [espIP, setEspIP] = useState('192.168.0.102');
   const wsRef = useRef(null);
   const intervalRef = useRef(null);
   const [lastCommand, setLastCommand] = useState('Ready to fly!');
   const [motorRPM, setMotorRPM] = useState({
-    frontLeft: 1000, frontRight: 1000, rearLeft: 1000, rearRight: 1000
-  });
-
+    frontLeft: 1000, frontRight: 1000, rearLeft: 1000, rearRight: 1000  });
+const [speed,setSpeed]=useState([]);
   const connect = () => {
     console.log("connect clicked ");
     const socket = new WebSocket(`ws://${espIP}:80/ws`);
@@ -29,8 +28,23 @@ const ControlDashboard = () => {
     };
 
     socket.onmessage = (event) => {
-      setStatus(event.data);
-      console.log('Received:', event.data);
+      try{
+         let message=JSON.parse(event.data);
+         setStatus(event.data);
+         setSpeed(message.values);
+      console.log('Received:', message.values);
+      for(let i=0;i<message.values.length;i++){
+      console.log(message.values[i],"my speeds")
+      }
+      }catch(e){
+console.log(e)
+      }
+    
+      
+       
+
+      
+      
     };
 
     socket.onclose = () => {
@@ -127,7 +141,7 @@ const ControlDashboard = () => {
       console.log(`Command sent: ${action}`);
       setLastCommand(`Sent: ${command.replace(/([A-Z])/g, ' $1').trim()}`);
 
-      const delta = 200;
+      const delta = 0;
       setMotorRPM(prev => {
         let newRPM = { ...prev };
 
@@ -276,10 +290,14 @@ const ControlDashboard = () => {
         <div className="motor-display">
           <h3>Motor RPM</h3>
           <div className="motors">
-            <div className="motor">FL: {motorRPM.frontLeft} RPM</div>
-            <div className="motor">FR: {motorRPM.frontRight} RPM</div>
-            <div className="motor">RL: {motorRPM.rearLeft} RPM</div>
-            <div className="motor">RR: {motorRPM.rearRight} RPM</div>
+     {speed.map((item, index) => (
+          <div className="motor" key={index}>{item}</div>
+        ))}
+           {/*<div className="motor">FL: {speed.frontLeft} RPM</div>
+            <div className="motor">FR: {speed.frontRight} RPM</div>
+            <div className="motor">RL: {speed.rearLeft} RPM</div>
+            <div className="motor">RR: {speed.rearRight} RPM</div> */}
+             
           </div>
         </div>
         
@@ -299,7 +317,7 @@ const ControlDashboard = () => {
             <button 
               onClick={() => sendCommand('PitchDown')} 
               title="Front motors: -RPM, Rear: +RPM → Nose Down"
-              disabled={!isConnected || !isThrottled}
+             
             >
               <span className="icon">⬇️</span> Pitch Down
             </button>
@@ -312,14 +330,14 @@ const ControlDashboard = () => {
             <button 
               onClick={() => sendCommand('RollLeft')} 
               title="Left motors: +RPM, Right: -RPM"
-              disabled={!isConnected || !isThrottled}
+              
             >
               <span className="icon">↩️</span> Roll Left
             </button>
             <button 
               onClick={() => sendCommand('RollRight')} 
               title="Right motors: +RPM, Left: -RPM"
-              disabled={!isConnected || !isThrottled}
+              
             >
               <span className="icon">↪️</span> Roll Right
             </button>
@@ -332,14 +350,14 @@ const ControlDashboard = () => {
             <button 
               onClick={() => sendCommand('YawLeft')} 
               title="Left: +RPM, Right: -RPM (CCW)"
-              disabled={!isConnected || !isThrottled}
+             
             >
               <span className="icon">⬅️</span> Yaw Left
             </button>
             <button 
               onClick={() => sendCommand('YawRight')} 
               title="Right: +RPM, Left: -RPM (CW)"
-              disabled={!isConnected || !isThrottled}
+              
             >
               <span className="icon">➡️</span> Yaw Right
             </button>
@@ -357,7 +375,7 @@ const ControlDashboard = () => {
               onTouchEnd={stopThrottle}
               onTouchCancel={stopThrottle}
               title="Hold for continuous throttle up"
-              disabled={!isConnected}
+             
             >
               <span className="icon">🔼</span> Gas Up (Hold)
             </button>
@@ -369,7 +387,7 @@ const ControlDashboard = () => {
               onTouchEnd={stopThrottle}
               onTouchCancel={stopThrottle}
               title="Hold for continuous throttle down"
-              disabled={!isConnected}
+            
             >
               <span className="icon">🔽</span> Brake Down (Hold)
             </button>
