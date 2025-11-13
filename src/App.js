@@ -9,7 +9,7 @@ const ControlDashboard = () => {
   const [espIP, setEspIP] = useState('192.168.0.102');
   const wsRef = useRef(null);
   const intervalRef = useRef(null);
-  const [lastCommand, setLastCommand] = useState('Ready to fly!');
+  const [lastCommand, setLastCommand] = useState('Ready to fly yeah!');
   const [motorRPM, setMotorRPM] = useState({
     frontLeft: 1000, frontRight: 1000, rearLeft: 1000, rearRight: 1000  });
 const [speed,setSpeed]=useState([]);
