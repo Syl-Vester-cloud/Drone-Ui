@@ -310,7 +310,7 @@ console.log(e)
             <button 
               onClick={() => sendCommand('PitchUp')} 
               title="Front motors: +RPM, Rear: -RPM → Nose Up"
-              disabled={!isConnected || !isThrottled}  // Gated by throttle
+             // disabled={!isConnected || !isThrottled}  // Gated by throttle
             >
               <span className="icon">⬆️</span> Pitch Up
             </button>
